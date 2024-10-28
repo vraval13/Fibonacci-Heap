@@ -26,7 +26,7 @@
         flex-direction: column;
         align-items: center;
         min-height: 100vh;
-        background: url('/image.png') no-repeat center center fixed;
+        background: url("/image.png") no-repeat center center fixed;
         background-size: cover;
         color: #333;
       }
@@ -177,13 +177,35 @@
         <a href="index.html">
           <button class="btn btn-primary btn-lg">Back</button>
         </a>
-        <br/>
+        <br />
         <div class="options">
           <p>Enter node value</p>
           <input type="text" id="insert" autofocus /><br /><br />
-          <button class="btn btn-primary btn-lg" onclick="create_node()">Insert Node</button>
+          <button class="btn btn-primary btn-lg" onclick="create_node()">
+            Insert Node
+          </button>
           <hr />
-          <button class="btn btn-primary btn-lg" onclick="extractMin()">Extract Min</button>
+          <button class="btn btn-primary btn-lg" onclick="extractMin()">
+            Extract Min
+          </button>
+          <hr />
+          <button class="btn btn-primary btn-lg" onclick="displayMin()">
+            Find Min
+          </button>
+          <div
+            id="minDisplay"
+            style="margin-top: 10px; color: #007bff; font-weight: bold"
+          ></div>
+          <!-- <hr /> -->
+          <!-- <p>Decrease Key</p>
+          <input type="text" id="nodeKey" placeholder="Current Key" />
+          <input type="text" id="newKey" placeholder="New Key" />
+          <button
+            class="btn btn-primary btn-lg"
+            onclick="decrease_key(parseInt(document.getElementById('nodeKey').value), parseInt(document.getElementById('newKey').value))"
+          >
+            Decrease Key
+          </button> -->
         </div>
         <div class="canvas-container">
           <canvas id="myCanvas" width="800" height="600"></canvas>
@@ -192,8 +214,80 @@
     </div>
 
     <!-- Footer Section -->
-    <div class="footer">
-      Created by Vyom Raval and Saiji Desai
-    </div>
+    <div class="footer">Created by Vyom Raval and Saiji Desai</div>
+    <script>
+      // Decrease Key Function
+      <!-- function decrease_key(nodeKey, newKey) {
+        const node = findNodeByKey(nodeKey);
+        if (!node) {
+          alert("Node with the specified key not found.");
+          return;
+        }
+        if (newKey >= node.key) {
+          alert("New key must be smaller than the current key.");
+          return;
+        }
+        node.key = newKey;
+        alert(`Node key decreased to ${newKey}.`);
+        restructureHeap(node);
+      }
+    
+      // Function to find a node by its key in the Fibonacci Heap
+      function findNodeByKey(key) {
+        const stack = [...heap.rootList]; // Assuming heap.rootList is the array of root nodes
+        while (stack.length > 0) {
+          const node = stack.pop();
+          if (node.key === key) return node;
+          if (node.child) stack.push(...node.child); // Add children to stack for search
+        }
+        return null; // No node with the specified key was found
+      }
+    
+      // Function to restructure the heap after decreasing a key
+      function restructureHeap(node) {
+        const parent = node.parent;
+        if (parent && node.key < parent.key) {
+          cut(node, parent);
+          cascadingCut(parent);
+        }
+        if (node.key < mini.key) {
+          mini = node;
+        }
+        display(mini, 0, true, 400, 80, [], true); // Redraw heap after restructure
+      }
+    
+      // Helper function to cut a node from its parent
+      function cut(node, parent) {
+        const index = parent.child.indexOf(node);
+        if (index !== -1) {
+          parent.child.splice(index, 1); // Remove node from parent's child list
+          node.parent = null;
+          node.mark = false;
+          if (parent.child.length === 0) parent.child = null; // Adjust parent if no children left
+          heap.rootList.push(node); // Add the node to the root list
+        }
+      }
+    
+      // Helper function for cascading cuts in the Fibonacci Heap
+      function cascadingCut(node) {
+        const parent = node.parent;
+        if (parent) {
+          if (!node.mark) {
+            node.mark = true;
+          } else {
+            cut(node, parent);
+            cascadingCut(parent);
+          }
+        }
+      }
+     -->
+      // Display minimum key function
+      function displayMin() {
+        find_min(); // Assumes find_min() in funCall.js sets 'mini' to the current min node
+        document.getElementById("minDisplay").innerText =
+          mini ? "Minimum Key: " + mini.key : "Heap is empty";
+      }
+    </script>
+    
   </body>
 </html>
