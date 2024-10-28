@@ -99,6 +99,34 @@
       .head {
         font-family: "Righteous", cursive;
       }
+      .footer {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 1em;
+        color: #555;
+        padding: 15px;
+        animation: fadeIn 2s ease-in-out;
+        background: rgba(255, 255, 255, 0.9);
+        width: 100%;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      @keyframes fadeIn {
+        0% {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .main {
+          flex-direction: column;
+        }
+      }
     </style>
   </head>
 
@@ -731,6 +759,9 @@ class FibonacciHeap {
           <img class="time" src="time.png" alt="Time Complexity Comparison" />
         </center>
         <br /><br />
+      </div>
+      <div class="footer">
+        Created by Vyom Raval and Saiji Desai
       </div>
     </div>
 
