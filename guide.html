@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Fibonacci Heap Visualisation</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins&family=Righteous&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/x-icon" href="ficon.png" />
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: url("/image.png") no-repeat center center fixed;
+        background-size: cover;
+        color: #333;
+      }
+
+      .main {
+        width: 90%;
+        max-width: 1100px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        margin-top: 20px;
+        padding: 20px;
+      }
+
+      .title p {
+        font-family: "Bebas Neue", cursive;
+        font-size: 2.5em;
+        color: #007bff;
+        margin: 20px 0;
+        text-align: center;
+        letter-spacing: 2px;
+      }
+
+      .content {
+        padding: 20px;
+      }
+
+      .content h2,
+      .content h3 {
+        color: #007bff;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #007bff 30%, #0056d2 90%);
+        border: none;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .btn-primary:hover {
+        transform: scale(1.05);
+        box-shadow: 0px 8px 20px rgba(0, 123, 255, 0.4);
+      }
+
+      .tab-content {
+        border: 1px solid #ddd;
+        border-top: none;
+        padding: 20px;
+        background-color: #f8f9fa;
+      }
+
+      .nav-tabs .nav-link.active {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+      }
+
+      pre {
+        background-color: #2d2d2d;
+        color: #fff;
+        padding: 20px;
+        border-radius: 5px;
+        overflow-x: auto;
+        font-family: Consolas, monospace;
+      }
+
+      .scroll {
+        overflow-x: auto;
+        margin-top: 20px;
+      }
+
+      .head {
+        font-family: "Righteous", cursive;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="main">
+      <div class="title">
+        <p>Step-by-Step Guide</p>
+      </div>
+      <div class="content">
+        <a href="index.html"
+          ><button class="btn btn-primary btn-lg">Back</button></a
+        >
+        <br /><br />
+        <center><h2 class="head">Pseudo Codes</h2></center>
+
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item">
+            <a
+              class="nav-link active"
+              id="cpp-tab"
+              data-toggle="tab"
+              href="#cpp"
+              role="tab"
+              aria-controls="cpp"
+              aria-selected="true"
+              >C++</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              id="python-tab"
+              data-toggle="tab"
+              href="#python"
+              role="tab"
+              aria-controls="python"
+              aria-selected="false"
+              >Python</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              id="java-tab"
+              data-toggle="tab"
+              href="#java"
+              role="tab"
+              aria-controls="java"
+              aria-selected="false"
+              >Java</a
+            >
+          </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent" style="height: 400px; overflow: auto;">
+          <div
+            class="tab-pane fade show active"
+            id="cpp"
+            role="tabpanel"
+            aria-labelledby="cpp-tab"
+          >
+            <pre>
+#include &lt;iostream&gt;
+class Node {
+  public:
+      int key;
+      int degree;
+      Node* parent;
+      Node* child;
+      Node* next;
+      Node* prev;
+      bool marked;
+  
+      Node(int k) : key(k), degree(0), parent(nullptr), child(nullptr), marked(false) {
+          next = this; // Circular list
+          prev = this; // Circular list
+      }
+  };
+  
+  class FibonacciHeap {
+  private:
+      Node* minNode; // Pointer to the node with the minimum key
+      int n;         // Number of nodes in the heap
+  
+      void link(Node* y, Node* x) {
+          // Link node y as a child of node x
+          y->prev->next = y->next;
+          y->next->prev = y->prev;
+          y->parent = x;
+  
+          if (x->child == nullptr) {
+              x->child = y;
+              y->next = y;
+              y->prev = y;
+          } else {
+              y->prev = x->child->prev;
+              y->next = x->child;
+              x->child->prev->next = y;
+              x->child->prev = y;
+          }
+          x->degree++;
+          y->marked = false;
+      }
+  
+      void consolidate() {
+          // Consolidate trees of the same degree
+          const int maxDegree = 64; // An upper bound for the number of trees
+          Node* A[maxDegree] = {nullptr}; // Array to hold the root list
+  
+          Node* w = minNode;
+          do {
+              Node* x = w;
+              int d = x->degree;
+  
+              while (A[d] != nullptr) {
+                  Node* y = A[d];
+                  if (x->key > y->key) {
+                      std::swap(x, y);
+                  }
+                  link(y, x);
+                  A[d] = nullptr;
+                  d++;
+              }
+              A[d] = x;
+              w = w->next;
+          } while (w != minNode);
+  
+          minNode = nullptr;
+          for (int i = 0; i < maxDegree; i++) {
+              if (A[i] != nullptr) {
+                  if (minNode == nullptr) {
+                      minNode = A[i];
+                  } else {
+                      // Add the tree to the root list
+                      A[i]->prev = minNode;
+                      A[i]->next = minNode->next;
+                      minNode->next->prev = A[i];
+                      minNode->next = A[i];
+  
+                      // Update minNode if necessary
+                      if (A[i]->key < minNode->key) {
+                          minNode = A[i];
+                      }
+                  }
+              }
+          }
+      }
+  
+  public:
+      FibonacciHeap() : minNode(nullptr), n(0) {}
+  
+      void insert(int key) {
+          Node* newNode = new Node(key);
+          if (minNode == nullptr) {
+              minNode = newNode;
+          } else {
+              newNode->next = minNode->next;
+              newNode->prev = minNode;
+              minNode->next->prev = newNode;
+              minNode->next = newNode;
+              if (newNode->key < minNode->key) {
+                  minNode = newNode;
+              }
+          }
+          n++;
+      }
+  
+      int findMin() {
+          return minNode ? minNode->key : std::numeric_limits<int>::max(); // Return max if empty
+      }
+  
+      void unionHeap(FibonacciHeap* otherHeap) {
+          if (otherHeap->minNode == nullptr) return; // Other heap is empty
+          if (minNode == nullptr) {
+              minNode = otherHeap->minNode;
+          } else {
+              Node* temp = minNode->next;
+              minNode->next = otherHeap->minNode->next;
+              otherHeap->minNode->next->prev = minNode;
+              otherHeap->minNode->next = temp;
+              temp->prev = otherHeap->minNode;
+  
+              if (otherHeap->minNode->key < minNode->key) {
+                  minNode = otherHeap->minNode;
+              }
+          }
+          n += otherHeap->n;
+          otherHeap->minNode = nullptr; // Clear other heap
+          otherHeap->n = 0;
+      }
+  
+      void decreaseKey(int oldKey, int newKey) {
+          if (newKey > oldKey) return; // Invalid operation
+          Node* x = minNode; // Find the node with the old key
+          while (x != nullptr) {
+              if (x->key == oldKey) break;
+              x = x->next;
+              if (x == minNode) return; // Loop back to start
+          }
+          if (x == nullptr) return; // Key not found
+  
+          x->key = newKey; // Decrease the key
+          Node* y = x->parent;
+  
+          if (y != nullptr && x->key < y->key) {
+              // Remove x from the child list of y
+              if (x->next == x) {
+                  y->child = nullptr;
+              } else {
+                  x->prev->next = x->next;
+                  x->next->prev = x->prev;
+              }
+              y->degree--;
+              x->next = minNode->next;
+              x->prev = minNode;
+              minNode->next->prev = x;
+              minNode->next = x;
+              x->parent = nullptr;
+              x->marked = false;
+          }
+  
+          if (x->key < minNode->key) {
+              minNode = x; // Update minNode
+          }
+      }
+  
+      int extractMinNode() {
+          Node* z = minNode;
+          if (z != nullptr) {
+              if (z->child != nullptr) {
+                  Node* child = z->child;
+                  do {
+                      Node* nextChild = child->next;
+                      child->prev = minNode->prev;
+                      child->next = minNode->next;
+                      minNode->prev->next = child;
+                      minNode->next->prev = child;
+                      child->parent = nullptr;
+                      child = nextChild;
+                  } while (child != z->child);
+              }
+  
+              z->prev->next = z->next;
+              z->next->prev = z->prev;
+              if (z == z->next) {
+                  minNode = nullptr;
+              } else {
+                  minNode = z->next;
+                  consolidate();
+              }
+              n--;
+              int key = z->key;
+              delete z; // Free memory
+              return key;
+          }
+          return std::numeric_limits<int>::max(); // Return max if empty
+      }
+  };
+  
+</pre
+            >
+          </div>
+          <div
+            class="tab-pane fade"
+            id="python"
+            role="tabpanel"
+            aria-labelledby="python-tab"
+          >
+            <pre><code>class Node:
+                    def __init__(self, key):
+                        self.key = key
+                        self.degree = 0
+                        self.parent = None
+                        self.child = None
+                        self.next = self
+                        self.prev = self
+                        self.marked = False
+                
+                class FibonacciHeap:
+                    def __init__(self):
+                        self.min_node = None
+                        self.n = 0
+                
+                    def insert(self, key):
+                        node = Node(key)
+                        if self.min_node is None:
+                            self.min_node = node
+                        else:
+                            node.next = self.min_node.next
+                            node.prev = self.min_node
+                            self.min_node.next.prev = node
+                            self.min_node.next = node
+                            if node.key < self.min_node.key:
+                                self.min_node = node
+                        self.n += 1
+                
+                    def findMin(self):
+                        return self.min_node.key if self.min_node else None
+                
+                    def union(self, otherHeap):
+                        if otherHeap.min_node is None:
+                            return
+                        if self.min_node is None:
+                            self.min_node = otherHeap.min_node
+                        else:
+                            temp = self.min_node.next
+                            self.min_node.next = otherHeap.min_node.next
+                            otherHeap.min_node.next.prev = self.min_node
+                            otherHeap.min_node.next = temp
+                            temp.prev = otherHeap.min_node
+                            if otherHeap.min_node.key < self.min_node.key:
+                                self.min_node = otherHeap.min_node
+                        self.n += otherHeap.n
+                
+                    def decreaseKey(self, x, newKey):
+                        if x is None or newKey > x.key:
+                            return
+                        x.key = newKey
+                        y = x.parent
+                        if y is not None and x.key < y.key:
+                            if x.next == x:
+                                y.child = None
+                            else:
+                                x.prev.next = x.next
+                                x.next.prev = x.prev
+                            y.degree -= 1
+                            x.next = self.min_node.next
+                            x.prev = self.min_node
+                            self.min_node.next.prev = x
+                            self.min_node.next = x
+                            x.parent = None
+                            x.marked = False
+                            if x.key < self.min_node.key:
+                                self.min_node = x
+                
+                    def extractMin(self):
+                        z = self.min_node
+                        if z is not None:
+                            if z.child is not None:
+                                child = z.child
+                                while True:
+                                    nextChild = child.next
+                                    child.prev = self.min_node.prev
+                                    child.next = self.min_node.next
+                                    self.min_node.prev.next = child
+                                    self.min_node.next.prev = child
+                                    child.parent = None
+                                    child = nextChild
+                                    if child == z.child:
+                                        break
+                            z.prev.next = z.next
+                            z.next.prev = z.prev
+                            if z == z.next:
+                                self.min_node = None
+                            else:
+                                self.min_node = z.next
+                                self.consolidate()
+                            self.n -= 1
+                            return z.key
+                        return None
+                
+                    def consolidate(self):
+                        A = [None] * (self.n + 1)
+                        w = self.min_node
+                        while True:
+                            x = w
+                            d = x.degree
+                            while A[d] is not None:
+                                y = A[d]
+                                if x.key > y.key:
+                                    x, y = y, x
+                                self.link(y, x)
+                                A[d] = None
+                                d += 1
+                            A[d] = x
+                            w = w.next
+                            if w == self.min_node:
+                                break
+                        self.min_node = None
+                        for node in A:
+                            if node is not None:
+                                if self.min_node is None:
+                                    self.min_node = node
+                                else:
+                                    node.next = self.min_node.next
+                                    node.prev = self.min_node
+                                    self.min_node.next.prev = node
+                                    self.min_node.next = node
+                                    if node.key < self.min_node.key:
+                                        self.min_node = node
+                
+                    def link(self, y, x):
+                        y.prev.next = y.next
+                        y.next.prev = y.prev
+                        y.parent = x
+                        if x.child is None:
+                            x.child = y
+                            y.next = y
+                            y.prev = y
+                        else:
+                            y.prev = x.child.prev
+                            y.next = x.child
+                            x.child.prev.next = y
+                            x.child.prev = y
+                        x.degree += 1
+                        y.marked = False
+                </code></pre>
+          </div>
+          <div
+            class="tab-pane fade"
+            id="java"
+            role="tabpanel"
+            aria-labelledby="java-tab"
+          >
+            <pre><code>class Node {
+            int key;
+            int degree;
+            Node parent;
+            Node child;
+            Node next;
+            Node prev;
+            boolean marked;
+        
+            Node(int key) {
+                this.key = key;
+                this.degree = 0;
+                this.parent = null;
+                this.child = null;
+                this.marked = false;
+                this.next = this;
+                this.prev = this;
+            }
+        }
+        
+        class FibonacciHeap {
+            Node minNode;
+            int n;
+        
+            FibonacciHeap() {
+                this.minNode = null;
+                this.n = 0;
+            }
+        
+            void insert(int key) {
+                Node newNode = new Node(key);
+                if (minNode == null) {
+                    minNode = newNode;
+                } else {
+                    newNode.next = minNode.next;
+                    newNode.prev = minNode;
+                    minNode.next.prev = newNode;
+                    minNode.next = newNode;
+                    if (newNode.key < minNode.key) {
+                        minNode = newNode;
+                    }
+                }
+                n++;
+            }
+        
+            int findMin() {
+                return (minNode != null) ? minNode.key : -1; // Returns -1 if the heap is empty
+            }
+        
+            void union(FibonacciHeap otherHeap) {
+                if (otherHeap.minNode == null) return;
+                if (this.minNode == null) {
+                    this.minNode = otherHeap.minNode;
+                } else {
+                    Node temp = this.minNode.next;
+                    this.minNode.next = otherHeap.minNode.next;
+                    otherHeap.minNode.next.prev = this.minNode;
+                    otherHeap.minNode.next = temp;
+                    temp.prev = otherHeap.minNode;
+                    if (otherHeap.minNode.key < this.minNode.key) {
+                        this.minNode = otherHeap.minNode;
+                    }
+                }
+                this.n += otherHeap.n;
+            }
+        
+            void decreaseKey(Node x, int newKey) {
+                if (x == null || newKey > x.key) return;
+                x.key = newKey;
+                Node y = x.parent;
+                if (y != null && x.key < y.key) {
+                    // Remove x from the child list of y
+                    if (x.next == x) {
+                        y.child = null;
+                    } else {
+                        x.prev.next = x.next;
+                        x.next.prev = x.prev;
+                    }
+                    y.degree--;
+                    // Add x to the root list
+                    x.next = minNode.next;
+                    x.prev = minNode;
+                    minNode.next.prev = x;
+                    minNode.next = x;
+                    x.parent = null;
+                    x.marked = false;
+                    if (x.key < minNode.key) {
+                        minNode = x;
+                    }
+                }
+            }
+        
+            int extractMin() {
+                Node z = minNode;
+                if (z != null) {
+                    if (z.child != null) {
+                        Node child = z.child;
+                        do {
+                            Node nextChild = child.next;
+                            child.prev = minNode.prev;
+                            child.next = minNode.next;
+                            minNode.prev.next = child;
+                            minNode.next.prev = child;
+                            child.parent = null;
+                            child = nextChild;
+                        } while (child != z.child);
+                    }
+                    z.prev.next = z.next;
+                    z.next.prev = z.prev;
+                    if (z == z.next) {
+                        minNode = null;
+                    } else {
+                        minNode = z.next;
+                        consolidate();
+                    }
+                    n--;
+                    return z.key;
+                }
+                return -1; // Returns -1 if the heap is empty
+            }
+        
+            void consolidate() {
+                Node[] A = new Node[n + 1];
+                Node w = minNode;
+                do {
+                    Node x = w;
+                    int d = x.degree;
+                    while (A[d] != null) {
+                        Node y = A[d];
+                        if (x.key > y.key) {
+                            Node temp = x;
+                            x = y;
+                            y = temp;
+                        }
+                        link(y, x);
+                        A[d] = null;
+                        d++;
+                    }
+                    A[d] = x;
+                    w = w.next;
+                } while (w != minNode);
+                minNode = null;
+                for (Node node : A) {
+                    if (node != null) {
+                        if (minNode == null) {
+                            minNode = node;
+                        } else {
+                            node.next = minNode.next;
+                            node.prev = minNode;
+                            minNode.next.prev = node;
+                            minNode.next = node;
+                            if (node.key < minNode.key) {
+                                minNode = node;
+                            }
+                        }
+                    }
+                }
+            }
+        
+            void link(Node y, Node x) {
+                y.prev.next = y.next;
+                y.next.prev = y.prev;
+                y.parent = x;
+                if (x.child == null) {
+                    x.child = y;
+                    y.next = y;
+                    y.prev = y;
+                } else {
+                    y.prev = x.child.prev;
+                    y.next = x.child;
+                    x.child.prev.next = y;
+                    x.child.prev = y;
+                }
+                x.degree++;
+                y.marked = false;
+            }
+        }
+        </code></pre>
+          </div>
+          <div
+            class="tab-pane fade"
+            id="js"
+            role="tabpanel"
+            aria-labelledby="js-tab"
+          >
+            <pre>
+class FibonacciHeap {
+    insert(key) {
+        // Insert implementation
+    }
+
+    findMin() {
+        // Find minimum implementation
+    }
+
+    union(otherHeap) {
+        // Union implementation
+    }
+
+    decreaseKey(oldKey, newKey) {
+        // Decrease key implementation
+    }
+
+    extractMinNode() {
+        // Extract minimum node implementation
+    }
+}
+</pre
+            >
+          </div>
+        </div>
+
+        <br /><br /><br /><br />
+        <center>
+          <h2 class="head">Time Complexity Comparison</h2>
+          <img class="time" src="time.png" alt="Time Complexity Comparison" />
+        </center>
+        <br /><br />
+      </div>
+    </div>
+
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9p/gSoRmE9mjK7Yt1N1aAUBVUEU2nP7JgEN6Q"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
