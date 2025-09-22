@@ -15,22 +15,21 @@
       rel="stylesheet"
     />
     <link rel="icon" type="image/x-icon" href="ficon.png" />
-    <!-- Put inside <head> -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-HVG7DBVLCK"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  // Use your Measurement ID here
-  gtag('config', 'G-XXXXXXXXXX', {
-    // optional: send page_path explicitly
-    'page_path': window.location.pathname + window.location.search
-  });
+    <!-- Google Analytics GA4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HVG7DBVLCK"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
 
-  // For testing only: enable debug mode if you want (remove for prod)
-  // gtag('set', {'debug_mode': true});
-</script>
+      // Configure GA4 with correct Measurement ID
+      gtag("config", "G-HVG7DBVLCK", {
+        page_path: window.location.pathname + window.location.search,
+      });
+    </script>
 
     <style>
       body {
@@ -43,7 +42,7 @@
         min-height: 100vh;
         background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
           url("/image.png") center center/cover no-repeat;
-        background: url('/image.png');
+        background: url("/image.png");
         background-size: cover;
         color: #333;
       }
@@ -140,7 +139,6 @@
         color: #333;
       }
 
-      /* Footer Styles */
       .footer {
         text-align: center;
         margin-top: 20px;
@@ -164,7 +162,6 @@
         }
       }
 
-      /* Responsive Styles */
       @media (max-width: 768px) {
         .main {
           flex-direction: column;
@@ -180,14 +177,35 @@
         }
       }
     </style>
+
     <script>
-      // Toggle active class on info tabs
       document.addEventListener("DOMContentLoaded", function () {
+        // Toggle info tabs + send GA event
         document.querySelectorAll(".info-tab").forEach((tab) => {
           tab.addEventListener("click", () => {
             tab.classList.toggle("active");
+            if (typeof gtag === "function") {
+              gtag("event", "info_tab_toggle", {
+                tab_title: tab.querySelector("h4").innerText,
+                state: tab.classList.contains("active") ? "opened" : "closed",
+              });
+            }
           });
         });
+
+        // Track button clicks
+        document
+          .querySelectorAll(".buttons a")
+          .forEach((link) =>
+            link.addEventListener("click", function () {
+              if (typeof gtag === "function") {
+                gtag("event", "nav_button_click", {
+                  label: this.innerText.trim(),
+                  destination: this.getAttribute("href"),
+                });
+              }
+            })
+          );
       });
     </script>
   </head>
@@ -237,9 +255,6 @@
         </div>
       </div>
     </div>
-    <!-- Footer Section -->
-    <div class="footer">
-      Created by Vyom Raval and Saiji Desai
-    </div>
+    <div class="footer">Created by Vyom Raval and Saiji Desai</div>
   </body>
 </html>
